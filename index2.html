@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>My Google Map</title>
+    
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    
+    <style type="text/css">
+   		body{
+   			background: url('sky.jpg') no-repeat;
+   			background-size: cover;
+   			color: black;
+   			font-family: cursive;
+
+   		}
+       .compact{
+        	margin: 20px;
+        }
+
+        #map{
+        	margin-top: 50px;
+        	margin-left: 190px;
+        	margin-right: 200px; 
+			height:400px;
+			width:70%;
+			overflow: hidden;
+			padding-bottom: 5%;
+			border-radius: 10px;
+			position:relative;
+		    }
+
+		  #input1,#input2, .btn,#setName{
+		  	width: 150px;
+		  	padding: 10px;
+		  	margin: 10px;
+		  }
+
+        .glow {
+        	margin-top: 40px;
+		 	font-size: 50px;
+		 	color: #fff;
+		  	text-align: center;
+		}
+
+    </style>
+
+
+   
+</head>
+<body>
+	<div class="container text-center">
+		<p class="text-center glow">GOOGLE MAP</p>
+		<div id="map" class="rounded"></div>
+		<br>
+	</div>
+
+   	<script>
+		function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: new google.maps.LatLng(20.5937,78.9629),
+          zoom: 6,
+          mapTypeId: 'roadmap'
+        });
+        var infoWindow = new google.maps.InfoWindow;
+
+          
+          downloadUrl('mapMarker.xml', function(data) {
+            var xml = data.responseXML;
+            var markers = xml.documentElement.getElementsByTagName('marker');
+            Array.prototype.forEach.call(markers, function(markerElem) {
+              var name = markerElem.getAttribute('name');
+              var point = new google.maps.LatLng(
+                  parseFloat(markerElem.getAttribute('lat')),
+                  parseFloat(markerElem.getAttribute('lng')));
+
+               var infoWindow = new google.maps.InfoWindow({content:'<h5 color="black">'+ name +'</h5>'})
+           
+              var marker = new google.maps.Marker({
+                map: map,
+                position: point,
+                animation: google.maps.Animation.DROP
+              });
+              marker.addListener('click', function() {
+
+                infoWindow.open(map,marker);
+                if(marker.getAnimation()!== null){
+				marker.setAnimation(null);
+				}
+				else{
+					marker.setAnimation(google.maps.Animation.BOUNCE);
+				}
+              });
+ 
+            });
+          });
+          
+        }
+
+
+      function downloadUrl(url, callback) {
+        var request = window.ActiveXObject ?
+            new ActiveXObject('Microsoft.XMLHTTP') :
+            new XMLHttpRequest;
+
+        request.onreadystatechange = function() {
+          if (request.readyState == 4) {
+            request.onreadystatechange = doNothing;
+            callback(request, request.status);
+          }
+        };
+
+        request.open('GET', url, true);
+        request.send(null);
+      }
+
+      function doNothing() {}
+		
+  
+	</script>
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=USE_YOUR_API_KEY&callback=initMap&libraries=&v=weekly"
+      async>
+    </script>
+      
+</body>
+</html>                            
+   
